@@ -5,20 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.subsystems;
+package frc.robot.subsystems
 
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.command.Subsystem
 
 /**
  * An example subsystem.  You can replace me with your own Subsystem.
  */
-public class ExampleSubsystem extends Subsystem {
-  // Put methods for controlling this subsystem
-  // here. Call these from Commands.
+class ExampleSubsystem : Subsystem() {
+    // Put methods for controlling this subsystem
+    // here. Call these from Commands.
 
-  @Override
-  public void initDefaultCommand() {
-    // Set the default command for a subsystem here.
-    // setDefaultCommand(new MySpecialCommand());
-  }
+    public override fun initDefaultCommand() {
+        // Set the default command for a subsystem here.
+        // setDefaultCommand(new MySpecialCommand());
+    }
 }
