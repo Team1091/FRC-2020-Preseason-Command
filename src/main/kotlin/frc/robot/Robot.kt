@@ -119,6 +119,6 @@ class Robot : TimedRobot() {
 
     companion object {
         var m_subsystem = ExampleSubsystem()
-        var m_oi: OI
+        lateinit var m_oi: OI
     }
 }
