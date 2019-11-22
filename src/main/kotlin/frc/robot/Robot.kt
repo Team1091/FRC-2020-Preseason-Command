@@ -12,8 +12,18 @@ import edu.wpi.first.wpilibj.command.Command
 import edu.wpi.first.wpilibj.command.Scheduler
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer
+import edu.wpi.first.networktables.NetworkTable
+import edu.wpi.first.networktables.NetworkTableInstance
+import edu.wpi.first.vision.VisionThread
 import frc.robot.commands.ExampleCommand
 import frc.robot.subsystems.ExampleSubsystem
+import edu.wpi.first.wpilibj.RobotDrive
+
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,6 +34,25 @@ import frc.robot.subsystems.ExampleSubsystem
  */
 class Robot : TimedRobot() {
 
+    private var networkTable:NetworkTableInstance? = null
+    private var gripNetworkTable:NetworkTable? = null
+
+    init{
+        networkTable = NetworkTableInstance.getDefault()
+        gripNetworkTable = NetworkTableInstance.getDefault().getTable("GRIP/myBlobsReport")
+
+    }
+
+    //Network Tables
+
+    private val IMG_WIDTH = 320
+    private val IMG_HEIGHT = 240
+
+    private val visionThread: VisionThread? = null
+    private val centerX = 0.0
+
+    private val imgLock = Any()
+
     internal var m_autonomousCommand: Command? = null
     internal var m_chooser = SendableChooser<Command>()
 
@@ -32,6 +61,11 @@ class Robot : TimedRobot() {
      * used for any initialization code.
      */
     override fun robotInit() {
+        //Camera Crap
+        var camera:UsbCamera = UsbCamera("Camera",0)
+        camera.setResolution(640,480)
+        CameraServer.getInstance().startAutomaticCapture(camera)
+
         m_oi = OI()
         m_chooser.setDefaultOption("Default Auto", ExampleCommand())
         // chooser.addOption("My Auto", new MyAutoCommand());
@@ -47,7 +81,23 @@ class Robot : TimedRobot() {
      * This runs after the mode specific periodic functions, but before
      * LiveWindow and SmartDashboard integrated updating.
      */
-    override fun robotPeriodic() {}
+    override fun robotPeriodic() {
+        var x = gripNetworkTable?.getEntry("x")?.getDoubleArray(doubleArrayOf())!!
+        var y = gripNetworkTable?.getEntry("y")?.getDoubleArray(doubleArrayOf())!!
+        var size = gripNetworkTable?.getEntry("size")?.getDoubleArray(doubleArrayOf())!!
+
+        var blobs = arrayListOf<VisionBlob>()
+        for ((index, value) in x.withIndex()){
+            var blob = VisionBlob()
+            blob.x = x[index]
+            blob.y = y[index]
+            blob.size = size[index]
+            //blobs.add(blob)
+            println("Blob $index : $blob")
+        }
+
+        //println("x: ${x.firstOrNull() ?: "N/A"}, y: ${y.firstOrNull() ?: "N/A"}, size: ${size.firstOrNull() ?: "N/A"}")
+    }
 
     /**
      * This function is called once each time the robot enters Disabled mode.
@@ -119,6 +169,6 @@ class Robot : TimedRobot() {
 
     companion object {
         var m_subsystem = ExampleSubsystem()
-        var m_oi: OI
+        var m_oi = OI()
     }
 }
